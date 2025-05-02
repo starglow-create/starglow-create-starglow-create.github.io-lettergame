@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <title>墨香信笺</title>
+    <style>
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* 蓝白黄配色 */
+        body {
+            background-color: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        nav {
+            background-color: #1e90ff;
+        }
+
+        .btn-yellow {
+            background-color: #ffd700;
+        }
+
+        .btn-yellow:hover {
+            background-color: #ffc107;
+        }
+
+        /* 星星样式 */
+        .star {
+            position: absolute;
+            background-color: #ffd700;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0.2;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.2;
+            }
+        }
+
+        /* 对话框样式 */
+        .chatbox {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .chatbox-header {
+            background-color: #1e90ff;
+            color: white;
+            padding: 10px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbox-messages {
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .chatbox-input {
+            display: flex;
+            padding: 10px;
+        }
+
+        .chatbox-input input {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .chatbox-input button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #ffd700;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .chatbox-input button:hover {
+            background-color: #ffc107;
+        }
+
+        /* 回信栏样式 */
+        #replySection {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+
+        #replyContent {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 4px;
+            min-height: 100px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+
+<body class="font-sans">
+    <!-- 星星 -->
+    <div id="stars"></div>
+
+    <!-- 导航栏 -->
+    <nav class="p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#" class="text-white text-xl font-bold">墨香信笺</a>
+            <div class="space-x-4">
+                <a href="#" class="text-white hover:text-gray-200">首页</a>
+                <a href="#" class="text-white hover:text-gray-200">关于</a>
+                <a href="#" class="text-white hover:text-gray-200">联系我们</a>
+                <button id="openModalBtn" class="bg-white text-blue-600 px-4 py-2 rounded-md hover:bg-gray-200">写信</button>
+                <button id="openRecordModalBtn" class="btn-yellow text-white px-4 py-2 rounded-md hover:bg-yellow-500">查看记录</button>
+                <button id="openChatboxLoginModalBtn" class="bg-white text-blue-600 px-4 py-2 rounded-md hover:bg-gray-200">解忧杂货箱</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <div class="container mx-auto p-8">
+        <h1 class="text-4xl font-bold text-center mb-8">经典书信</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- 书信卡片 -->
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-300">
+                <h2 class="text-xl font-bold mb-2">致远方友人</h2>
+                <p class="text-gray-600 mb-4">在这宁静的时光里，我想与你分享我的思绪......</p>
+                <a href="#" class="text-blue-600 hover:underline">阅读全文 <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-300">
+                <h2 class="text-xl font-bold mb-2">爱的告白</h2>
+                <p class="text-gray-600 mb-4">当我第一次见到你，我的心就被你深深吸引......</p>
+                <a href="#" class="text-blue-600 hover:underline">阅读全文 <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-300">
+                <h2 class="text-xl font-bold mb-2">梦想的追逐</h2>
+                <p class="text-gray-600 mb-4">每个人都有自己的梦想，我也在努力追逐着......</p>
+                <a href="#" class="text-blue-600 hover:underline">阅读全文 <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 写信模态框 -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">写信</h2>
+            <form id="letterForm">
+                <div class="mb-4">
+                    <label for="recipient" class="block text-gray-700 font-bold mb-2">收件人:</label>
+                    <input type="text" id="recipient" class="border border-gray-300 p-2 w-full rounded-md" required>
+                </div>
+                <div class="mb-4">
+                    <label for="subject" class="block text-gray-700 font-bold mb-2">主题:</label>
+                    <input type="text" id="subject" class="border border-gray-300 p-2 w-full rounded-md" required>
+                </div>
+                <div class="mb-4">
+                    <label for="content" class="block text-gray-700 font-bold mb-2">内容:</label>
+                    <textarea id="content" rows="4" class="border border-gray-300 p-2 w-full rounded-md" required></textarea>
+                </div>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">寄信</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 查看记录模态框 -->
+    <div id="recordModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">输入密码查看记录</h2>
+            <input type="password" id="recordPasswordInput" class="border border-gray-300 p-2 w-full rounded-md mb-4" placeholder="输入密码">
+            <button id="checkRecordPasswordBtn" class="btn-yellow text-white px-4 py-2 rounded-md hover:bg-yellow-500">确认</button>
+            <div id="recordList" class="mt-4 hidden">
+                <h3 class="text-xl font-bold mb-2">写信记录</h3>
+                <ul id="recordItems"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 解忧杂货箱登录模态框 -->
+    <div id="chatboxLoginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">输入密码登录解忧杂货箱</h2>
+            <input type="password" id="chatboxPasswordInput" class="border border-gray-300 p-2 w-full rounded-md mb-4" placeholder="输入密码">
+            <button id="checkChatboxPasswordBtn" class="btn-yellow text-white px-4 py-2 rounded-md hover:bg-yellow-500">确认</button>
+        </div>
+    </div>
+
+    <!-- 解忧杂货箱对话框 -->
+    <div class="chatbox" id="chatbox">
+        <div class="chatbox-header">
+            <h3>解忧杂货箱</h3>
+            <span class="close" id="closeChatbox">&times;</span>
+        </div>
+        <div class="chatbox-messages" id="chatboxMessages"></div>
+        <div class="chatbox-input">
+            <input type="text" id="chatboxInput" placeholder="输入你的问题">
+            <button id="sendMessageBtn">发送</button>
+        </div>
+    </div>
+
+    <!-- 查看回信模态框 -->
+    <div id="replyModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">输入密码查看回信</h2>
+            <input type="password" id="replyPasswordInput" class="border border-gray-300 p-2 w-full rounded-md mb-4" placeholder="输入密码">
+            <button id="checkReplyPasswordBtn" class="btn-yellow text-white px-4 py-2 rounded-md hover:bg-yellow-500">确认</button>
+            <div id="replyList" class="mt-4 hidden">
+                <h3 class="text-xl font-bold mb-2">回信记录</h3>
+                <ul id="replyItems"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white p-4 text-center">
+        <p>&copy; 2025 墨香信笺. 保留所有权利.</p>
+        <button id="openReplyModalBtn" class="btn-yellow text-white px-4 py-2 rounded-md hover:bg-yellow-500">查看回信</button>
+    </footer>
+
+    <script>
+        // 获取模态框和按钮元素
+        const modal = document.getElementById('myModal');
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementsByClassName('close')[0];
+        const letterForm = document.getElementById('letterForm');
+        const recordModal = document.getElementById('recordModal');
+        const openRecordModalBtn = document.getElementById('openRecordModalBtn');
+        const recordPasswordInput = document.getElementById('recordPasswordInput');
+        const checkRecordPasswordBtn = document.getElementById('checkRecordPasswordBtn');
+        const recordList = document.getElementById('recordList');
+        const recordItems = document.getElementById('recordItems');
+        const starsContainer = document.getElementById('stars');
+        const chatboxLoginModal = document.getElementById('chatboxLoginModal');
+        const openChatboxLoginModalBtn = document.getElementById('openChatboxLoginModalBtn');
+        const chatboxPasswordInput = document.getElementById('chatboxPasswordInput');
+        const checkChatboxPasswordBtn = document.getElementById('checkChatboxPasswordBtn');
+        const chatbox = document.getElementById('chatbox');
+        const closeChatbox = document.getElementById('closeChatbox');
+        const chatboxMessages = document.getElementById('chatboxMessages');
+        const chatboxInput = document.getElementById('chatboxInput');
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+        const replyModal = document.getElementById('replyModal');
+        const openReplyModalBtn = document.getElementById('openReplyModalBtn');
+        const replyPasswordInput = document.getElementById('replyPasswordInput');
+        const checkReplyPasswordBtn = document.getElementById('checkReplyPasswordBtn');
+        const replyList = document.getElementById('replyList');
+        const replyItems = document.getElementById('replyItems');
+
+        let letterRecords = [];
+        let replyRecords = [];
+
+        // 生成星星
+        function createStars() {
+            const numStars = 20;
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * window.innerWidth + 'px';
+                star.style.top = Math.random() * window.innerHeight + 'px';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // 打开写信模态框
+        openModalBtn.onclick = function () {
+            modal.style.display = 'block';
+        }
+
+        // 关闭写信模态框
+        closeModalBtn.onclick = function () {
+            modal.style.display = 'none';
+        }
+
+        // 点击写信模态框外部关闭
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+            if (event.target == recordModal) {
+                recordModal.style.display = 'none';
+            }
+            if (event.target == chatboxLoginModal) {
+                chatboxLoginModal.style.display = 'none';
+            }
+            if (event.target == replyModal) {
+                replyModal.style.display = 'none';
+            }
+        }
+
+        // 处理寄信表单提交
+        letterForm.onsubmit = function (event) {
+            event.preventDefault();
+            const recipient = document.getElementById('recipient').value;
+            const subject = document.getElementById('subject').value;
+            const content = document.getElementById('content').value;
+
+            const record = {
+                recipient: recipient,
+                subject: subject,
+                content: content
+            };
+            letterRecords.push(record);
+
+            alert(`信件已寄给 ${recipient}，主题: ${subject}，内容: ${content}`);
+
+            // 生成回信
+            const reply = generateReply(content);
+            replyRecords.push(reply);
+
+            // 清空表单并关闭模态框
+            letterForm.reset();
+            modal.style.display = 'none';
+        }
+
+        // 打开查看记录模态框
+        openRecordModalBtn.onclick = function () {
+            recordModal.style.display = 'block';
+            recordList.classList.add('hidden');
+            recordPasswordInput.value = '';
+        }
+
+        // 检查记录密码
+        checkRecordPasswordBtn.onclick = function () {
+            const password = recordPasswordInput.value;
+            if (password === 'baccano') {
+                recordItems.innerHTML = '';
+                letterRecords.forEach((record, index) => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `记录 ${index + 1}: 收件人 - ${record.recipient}, 主题 - ${record.subject}, 内容 - ${record.content}`;
+                    recordItems.appendChild(listItem);
+                });
+                recordList.classList.remove('hidden');
+            } else {
+                alert('密码错误，请重试。');
+            }
+        }
+
+        // 打开解忧杂货箱登录模态框
+        openChatboxLoginModalBtn.onclick = function () {
+            chatboxLoginModal.style.display = 'block';
+        }
+
+        // 检查解忧杂货箱密码
+        checkChatboxPasswordBtn.onclick = function () {
+            const password = chatboxPasswordInput.value;
+            if (password === '123') {
+                chatboxLoginModal.style.display = 'none';
+                chatbox.style.display = 'block';
+                // 加载当天的语录
+                loadDailyQuote();
+            } else {
+                alert('密码错误，请重试。');
+            }
+        }
+
+        // 关闭解忧杂货箱对话框
+        closeChatbox.onclick = function () {
+            chatbox.style.display = 'none';
+        }
+
+        // 发送消息到解忧杂货箱
+        sendMessageBtn.onclick = function () {
+            const message = chatboxInput.value;
+            if (message) {
+                const userMessage = document.createElement('div');
+                userMessage.textContent = `你: ${message}`;
+                chatboxMessages.appendChild(userMessage);
+
+                // 模拟自动回复，可根据需求修改回复内容
+                const replies = [
+                    "别着急，慢慢梳理问题，也许答案就在其中。",
+                    "人生就像一场旅行，偶尔的迷茫只是风景的一部分。",
+                    "换个角度看问题，说不定会有新的发现。",
+                    "困难只是暂时的，坚持下去，光明就在前方。"
+                ];
+                const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                const replyMessage = document.createElement('div');
+                replyMessage.textContent = `解忧杂货箱: ${randomReply}`;
+                chatboxMessages.appendChild(replyMessage);
+
+                chatboxInput.value = '';
+                chatboxMessages.scrollTop = chatboxMessages.scrollHeight;
+            }
+        }
+
+        // 生成每天不同的语录
+        function generateDailyQuote() {
+            const quotes = [
+        "生活总是让我们遍体鳞伤，但到后来，那些受伤的地方一定会变成我们最强壮的地方。",
+        "无论你觉得自己多么的不幸，永远有人比你更加不幸。无论你觉得自己多么的了不起，也永远有人比你更强。",
+        "心小了，所有的小事就大了；心大了，所有的大事都小了；看淡世事沧桑，内心安然无恙。",
+        "你不能决定生命的长度，但你可以控制它的宽度；你不能左右天气，但你可以改变心情。",
+        "每一个不曾起舞的日子，都是对生命的辜负。",
+        "无论如何，不要放弃希望。",
+        "你必须要学会，如何在寂寞中快乐。",
+        "当你感觉到无助，其实你是最有力量的。",
+        "不要在意别人的看法，只有真实的自己是最好的。",
+        "有时候，远走高飞是一种选择，也是一种自由。",
+        "任何时候都不要放弃自己，因为你是独一无二的。"
+            ];
+            const today = new Date().toDateString();
+            const seed = today.split(' ').join('');
+            let hash = 0;
+            for (let i = 0; i < seed.length; i++) {
+                const char = seed.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            const index = Math.abs(hash) % quotes.length;
+            return quotes[index];
+        }
+
+        // 加载当天的语录
+        function loadDailyQuote() {
+            const quote = generateDailyQuote();
+            const quoteMessage = document.createElement('div');
+            quoteMessage.textContent = `解忧杂货箱今日语录: ${quote}`;
+            chatboxMessages.appendChild(quoteMessage);
+            chatboxMessages.scrollTop = chatboxMessages.scrollHeight;
+        }
+
+       // 生成回信
+function generateReply(content) {
+    const positiveKeywords = ['开心', '快乐', '成功', '希望'];
+    const negativeKeywords = ['难过', '伤心', '失败', '迷茫'];
+
+    let isPositive = false;
+    let isNegative = false;
+
+    positiveKeywords.forEach(keyword => {
+        if (content.includes(keyword)) {
+            isPositive = true;
+        }
+    });
+
+    negativeKeywords.forEach(keyword => {
+        if (content.includes(keyword)) {
+            isNegative = true;
+        }
+    });
+
+    if (isPositive) {
+        const positiveReplies = [
+            "真好呀，能感受到你此刻满满的喜悦！愿这份快乐一直延续下去，未来还有更多的成功在等着你呢。",
+            "你的开心就像阳光一样照亮了周围，希望这份好心情能陪伴你度过每一个美好的瞬间，继续追逐更多的希望吧。",
+            "为你的成功喝彩！快乐其实很简单，就是在生活中不断发现美好，愿你以后的日子里一直充满欢声笑语。"
+        ];
+        return positiveReplies[Math.floor(Math.random() * positiveReplies.length)];
+    } else if (isNegative) {
+        const negativeReplies = [
+            "别太难过啦，每个人都会经历失败和迷茫的时刻，这只是暂时的。相信自己，你一定有足够的能力走出困境。",
+            "心疼你的伤心，不过这也是成长的一部分呀。把这次的经历当作一次教训，未来的路会越走越顺的。",
+            "生活有时候会给我们一些考验，但请相信，风雨过后总会有彩虹。振作起来，重新找回那个充满斗志的你。"
+        ];
+        return negativeReplies[Math.floor(Math.random() * negativeReplies.length)];
+    } else {
+        const neutralReplies = [
+            "我认真阅读了你的信，能感受到你真诚的表达。生活就是这样，有平淡也有精彩，愿你在平凡的日子里也能发现小确幸。",
+            "你的话语很温暖，让我仿佛看到了你内心的善良。无论生活如何变化，都要保持一颗乐观的心哦。",
+            "谢谢你和我分享这些，生活中的点点滴滴都值得我们去珍惜。希望你能一直拥有这份对生活的热爱。",
+            "不要气馁，因为失败是成功之母。",
+            "人生犹如一场旅行，路途中有高峰也有低谷。",
+            "每一次经历，都是个人成长的机会。",
+            "不要犹豫，勇敢面对人生每一面。",
+            "不要妄自菲薄，因为只有自己才能改变自己的命运。",
+            "无论前方有多么多个未知，要一直坚持下去。面对挫折时，不要气馁，因为这也是成长的契机。",
+            "人生如同一场冒险，路上充满未知和风险。",
+            "学会接受失败，从中吸取教训，才能让自己更加强大。",
+            "从失败中站起来，比从未跌倒更重要。",
+            "不要低估自己的能力，因为每个人都有独特的优势和潜力",
+            "不要让悲伤吞噬了自己的微笑，因为阳光依旧在前方等待着。",
+            "人生旅程中会遇到很多坎坷，但坚定信念就能克服困难。",
+            "坚信自己能够战胜困境，因为勇气比智慧更重要。",
+            "面对困难时，不要退缩，勇敢面对才能跨越难关。",
+            "失败只是前进路上的一站，不要因此丧失信心。",
+            "每个人都会面临困难和挑战，但不要放弃自己的信念。",
+            "无论前路多么曲折，都要坚定信心，不放弃希望。",
+            "坚毅的意志才能克服困难，让自己更加强大。",
+            "失败有时候是必要的，因为它能让我们学习和成长。",
+            "面对困境时，不要逃避，而是勇敢面对，才能寻找到一个更好的自己。",
+            "躺平也无妨"
+        ];
+        return neutralReplies[Math.floor(Math.random() * neutralReplies.length)];
+    }
+}    
+
+        // 打开查看回信模态框
+        openReplyModalBtn.onclick = function () {
+            replyModal.style.display = 'block';
+            replyList.classList.add('hidden');
+            replyPasswordInput.value = '';
+        }
+
+        // 检查回信密码
+        checkReplyPasswordBtn.onclick = function () {
+            const password = replyPasswordInput.value;
+            if (password === '513') {
+                replyItems.innerHTML = '';
+                replyRecords.forEach((reply, index) => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `回信 ${index + 1}: ${reply}`;
+                    replyItems.appendChild(listItem);
+                });
+                replyList.classList.remove('hidden');
+            } else {
+                alert('密码错误，请重试。');
+            }
+        }
+
+    // 保存模态框状态到 localStorage
+        function saveModalStates() {
+            const modalStates = {
+                myModal: modal.style.display === 'block',
+                recordModal: recordModal.style.display === 'block',
+                chatboxLoginModal: chatboxLoginModal.style.display === 'block',
+                replyModal: replyModal.style.display === 'block',
+                chatbox: chatbox.style.display === 'block'
+            };
+            localStorage.setItem('modalStates', JSON.stringify(modalStates));
+        }
+
+        // 页面加载时生成星星
+        window.onload = function () {
+            createStars();
+            // 恢复表单数据
+            const formData = JSON.parse(localStorage.getItem('formData')) || {};
+            document.getElementById('recipient').value = formData.recipient || '';
+            document.getElementById('subject').value = formData.subject || '';
+            document.getElementById('content').value = formData.content || '';
+
+            // 表单数据变化时保存到 localStorage
+            letterForm.addEventListener('input', function () {
+                const formData = {
+                    recipient: document.getElementById('recipient').value,
+                    subject: document.getElementById('subject').value,
+                    content: document.getElementById('content').value
+                };
+                localStorage.setItem('formData', JSON.stringify(formData));
+            });
+        }
+    </script>
+</body>
+
+</html>    
